@@ -1,4 +1,4 @@
-#include "SimpleCache.h"
+#include "L1Cache.h"
 
 uint8_t L1Cache[L1_SIZE];
 uint8_t L2Cache[L2_SIZE];
