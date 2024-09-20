@@ -25,9 +25,14 @@ typedef struct CacheLine {
   uint32_t Tag;
 } CacheLine;
 
-typedef struct Cache {
+typedef struct L1 {
   uint32_t init;
-  CacheLine line;
+  CacheLine line[L1_SIZE / BLOCK_SIZE];
+} Cache;
+
+typedef struct L2 {
+  uint32_t init;
+  CacheLine line[L2_SIZE / BLOCK_SIZE];
 } Cache;
 
 /*********************** Interfaces *************************/

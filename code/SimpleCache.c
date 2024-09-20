@@ -46,6 +46,7 @@ void accessL1(uint32_t address, uint8_t *data, uint32_t mode) {
   CacheLine *Line = &SimpleCache.line;
 
   Tag = address >> 3; // Why do I do this?
+  index = (address >> 3) & 0x00000007; 
 
   MemAddress = address >> 3; // again this....!
   MemAddress = MemAddress << 3; // address of the block in memory
