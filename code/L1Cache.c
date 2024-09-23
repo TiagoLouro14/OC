@@ -27,6 +27,7 @@ void accessDRAM(uint32_t address, uint8_t *data, uint32_t mode) {
     }
 }
 
+
 /*********************** L1 cache *************************/
 
 void initCache() { L1.init = 0; }
@@ -35,17 +36,16 @@ void accessL1(uint32_t address, uint8_t *data, uint32_t mode) {
     uint32_t index, Tag, MemAddress;
     uint8_t TempBlock[BLOCK_SIZE];
 
-    Tag = address >> 3; // Why do I do this?
-    index = address & 0x7;
+    Tag = address >> 8; // Usar os bits mais significativos para o Tag
+    index = (address >> 8) & ((L1_SIZE / BLOCK_SIZE)); // Usar os bits seguintes para o índice
 
-    //printf("address -> %u ; index -> %u\n", address, index);
-
-    MemAddress = address >> 3; // again this....!
-    MemAddress = MemAddress << 3; // address of the block in memory
+    MemAddress = address & ~0xFF; // Endereço do bloco na memória
 
     /* init cache */
     if (L1.init == 0) {
-        L1.line[index].Valid = 0;
+        for (int i = 0; i < (L1_SIZE / BLOCK_SIZE); i++) {
+            L1.line[i].Valid = 0;
+        }
         L1.init = 1;
     }
 
@@ -58,13 +58,11 @@ void accessL1(uint32_t address, uint8_t *data, uint32_t mode) {
         accessDRAM(MemAddress, TempBlock, MODE_READ); // get new block from DRAM
 
         if ((Line->Valid) && (Line->Dirty)) {
-            // line has dirty block
-            MemAddress = Line->Tag << 3; // get address of the block in memory
+            MemAddress = Line->Tag << 8; // get address of the block in memory
             accessDRAM(MemAddress, &(L1Cache[index]), MODE_WRITE); // then write back old block
         }
 
-        memcpy(&(L1Cache[index]), TempBlock,
-               BLOCK_SIZE); // copy new block to cache line
+        memcpy(&(L1Cache[index]), TempBlock, BLOCK_SIZE); // copy new block to cache line
         Line->Valid = 1;
         Line->Tag = Tag;
         Line->Dirty = 0;
@@ -75,7 +73,6 @@ void accessL1(uint32_t address, uint8_t *data, uint32_t mode) {
         memcpy(data, &(L1Cache[index]), WORD_SIZE);
         time += L1_READ_TIME;
     }
-
     if (mode == MODE_WRITE) {
         // write data from cache line
         memcpy(&(L1Cache[index]), data, WORD_SIZE);
