@@ -72,26 +72,13 @@ void accessL1(uint32_t address, uint8_t *data, uint32_t mode) {
 
     if (mode == MODE_READ) {
         // read data from cache line
-        if (0 == (address % 8)) {
-            // even word on block
-            memcpy(data, &(L1Cache[index]), WORD_SIZE);
-        } else {
-            // odd word on block
-            //buff = data & 0x07;
-            memcpy(data, &(L1Cache[index]), WORD_SIZE);
-        }
+        memcpy(data, &(L1Cache[index]), WORD_SIZE);
         time += L1_READ_TIME;
     }
 
     if (mode == MODE_WRITE) {
         // write data from cache line
-        if (!(address % 8)) {
-            // even word on block
-            memcpy(&(L1Cache[index]), data, WORD_SIZE);
-        } else {
-            // odd word on block
-            memcpy(&(L1Cache[index]), data, WORD_SIZE);
-        }
+        memcpy(&(L1Cache[index]), data, WORD_SIZE);
         time += L1_WRITE_TIME;
         Line->Dirty = 1;
     }
