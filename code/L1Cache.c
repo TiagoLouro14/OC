@@ -27,42 +27,45 @@ void accessDRAM(uint32_t address, uint8_t *data, uint32_t mode) {
     }
 }
 
-
 /*********************** L1 cache *************************/
-
-void initCache() { L1.init = 0; }
+void initCache() {
+    L1.init = 0;
+    for (int i = 0; i < (L1_SIZE / BLOCK_SIZE); i++) {
+        L1.line[i].Valid = 0;
+        L1.line[i].Dirty = 0;
+        L1.line[i].Tag = 0;
+    }
+    L1.init = 1;
+}
 
 void accessL1(uint32_t address, uint8_t *data, uint32_t mode) {
     uint32_t index, Tag, MemAddress;
     uint8_t TempBlock[BLOCK_SIZE];
 
-    Tag = address >> 8; // Usar os bits mais significativos para o Tag
-    index = (address >> 8) & ((L1_SIZE / BLOCK_SIZE)); // Usar os bits seguintes para o índice
+    Tag = address >> 14; // Usar os 18 bits mais significativos para o Tag (32 - 6 - 8)
+    index = (address >> 6) & 0xFF; // Usar os 8 bits seguintes para o índice (256 linhas, 0xFF = 255)
 
-    MemAddress = address & ~0xFF; // Endereço do bloco na memória
+    MemAddress = address & ~(BLOCK_SIZE - 1); // Endereço do bloco na memória
 
     /* init cache */
     if (L1.init == 0) {
-        for (int i = 0; i < (L1_SIZE / BLOCK_SIZE); i++) {
-            L1.line[i].Valid = 0;
-        }
-        L1.init = 1;
+        initCache();
     }
 
     CacheLine *Line = &L1.line[index];
 
     /* access Cache*/
-
     if (!Line->Valid || Line->Tag != Tag) {
         // if block not present - miss
         accessDRAM(MemAddress, TempBlock, MODE_READ); // get new block from DRAM
-
+      
         if ((Line->Valid) && (Line->Dirty)) {
-            MemAddress = Line->Tag << 8; // get address of the block in memory
-            accessDRAM(MemAddress, &(L1Cache[index]), MODE_WRITE); // then write back old block
+            MemAddress = (Line->Tag << 6) | (index << 6); // get address of the block in memory
+            accessDRAM(MemAddress, &L1Cache[index * BLOCK_SIZE], MODE_WRITE); // then write back old block
+            
         }
 
-        memcpy(&(L1Cache[index]), TempBlock, BLOCK_SIZE); // copy new block to cache line
+        memcpy(&L1Cache[index * BLOCK_SIZE], TempBlock, BLOCK_SIZE); // copy new block to cache line
         Line->Valid = 1;
         Line->Tag = Tag;
         Line->Dirty = 0;
@@ -70,13 +73,13 @@ void accessL1(uint32_t address, uint8_t *data, uint32_t mode) {
 
     if (mode == MODE_READ) {
         // read data from cache line
-        memcpy(data, &(L1Cache[index]), WORD_SIZE);
-        time += L1_READ_TIME;
+        memcpy(data, &L1Cache[index * BLOCK_SIZE + (address & (BLOCK_SIZE - 1))], WORD_SIZE);
+        time += L1_READ_TIME; // Incrementar o tempo para leitura do cache
     }
     if (mode == MODE_WRITE) {
-        // write data from cache line
-        memcpy(&(L1Cache[index]), data, WORD_SIZE);
-        time += L1_WRITE_TIME;
+        // write data to cache line
+        memcpy(&L1Cache[index * BLOCK_SIZE + (address & (BLOCK_SIZE - 1))], data, WORD_SIZE);
+        time += L1_WRITE_TIME; // Incrementar o tempo para escrita no cache
         Line->Dirty = 1;
     }
 }
