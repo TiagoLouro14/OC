@@ -18,6 +18,7 @@ void accessDRAM(uint32_t, uint8_t *, uint32_t);
 
 void initCache();
 void accessL1(uint32_t, uint8_t *, uint32_t);
+void accessL2(uint32_t, uint8_t *, uint32_t);
 
 typedef struct CacheLine {
   uint8_t Valid;
@@ -27,8 +28,13 @@ typedef struct CacheLine {
 
 typedef struct Cache {
   uint32_t init;
-  CacheLine line[L1_SIZE];
+  CacheLine line[L1_SIZE / BLOCK_SIZE];
 } Cache;
+
+typedef struct Cache2 {
+  uint32_t init;
+  CacheLine line[L2_SIZE / BLOCK_SIZE];
+} Cache2;
 
 /*********************** Interfaces *************************/
 
