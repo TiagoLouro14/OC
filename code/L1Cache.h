@@ -6,40 +6,28 @@
 #include <string.h>
 #include <stdint.h>
 #include "Cache.h"
+#include "L2Cache.h"
 
 void resetTime();
 
 uint32_t getTime();
 
-/****************  RAM memory (byte addressable) ***************/
-void accessDRAM(uint32_t, uint8_t *, uint32_t);
+void accessDRAM(uint32_t address, uint8_t *data, uint32_t mode);
 
-/*********************** Cache *************************/
 
 void initCache();
-void accessL1(uint32_t, uint8_t *, uint32_t);
-void accessL2(uint32_t, uint8_t *, uint32_t);
 
-typedef struct CacheLine {
-  uint8_t Valid;
-  uint8_t Dirty;
-  uint32_t Tag;
-} CacheLine;
+void initCacheL1();
 
-typedef struct Cache {
-  uint32_t init;
-  CacheLine line[L1_SIZE / BLOCK_SIZE];
-} Cache;
+void accessL1(uint32_t address, uint8_t *data, uint32_t mode);
 
-typedef struct Cache2 {
-  uint32_t init;
-  CacheLine line[L2_SIZE / BLOCK_SIZE];
-} Cache2;
+typedef struct Cache1 {
+    uint32_t init;
+    CacheLine line[L1_SIZE / BLOCK_SIZE];
+} Cache1;
 
-/*********************** Interfaces *************************/
+void read(uint32_t address, uint8_t *data);
 
-void read(uint32_t, uint8_t *);
-
-void write(uint32_t, uint8_t *);
+void write(uint32_t address, uint8_t *data);
 
 #endif
