@@ -196572,11 +196572,11 @@
 [13169235] W DRAM[ffdf000]
 [13169335] W DRAM[ffff000]
 [13169336] W Disk[babe00000000]
-[14169339] R DRAM[0]
-[14169439] W DRAM[0]
-[14169539] W DRAM[ffe0000]
-[14169639] W DRAM[0]
-Elapsed: 14169639 ns
+[14169337] R DRAM[0]
+[14169437] W DRAM[0]
+[14169537] W DRAM[ffe0000]
+[14169637] W DRAM[0]
+Elapsed: 14169637 ns
 Total instructions executed: 65536
 Total page faults: 65536
 Total page evictions: 1
