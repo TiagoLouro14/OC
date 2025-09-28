@@ -2,3 +2,9 @@
 .DS_Store
 reports
 build
+
+# Ignore all hidden files (files starting with .)
+.*
+
+# But don't ignore .gitignore itself
+!.gitignore
