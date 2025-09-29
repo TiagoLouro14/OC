@@ -11,10 +11,6 @@ mkdir -p reports
 
 make -j
 
-# Arrays para armazenar resultados dos testes
-passed_tests=()
-failed_tests=()
-
 for input in inputs/*; do
     input_file=$(basename "$input" .txt)
 
@@ -38,38 +34,7 @@ for input in inputs/*; do
 
     if diff -y --expand-tabs $expected_output_file reports/$input_file.out >> $report_file; then
         echo "# Test $input_file passed" >> $report_file
-        passed_tests+=("$input_file")
     else
         echo "# Test $input_file failed" >> $report_file
-        failed_tests+=("$input_file")
     fi
 done
-
-# Gerar relatório de resumo
-summary_file=reports/summary.txt
-echo "#####################################################################" > $summary_file
-echo "#                        RELATÓRIO DE TESTES                         #" >> $summary_file
-echo "#####################################################################" >> $summary_file
-echo >> $summary_file
-
-echo "TESTES APROVADOS (${#passed_tests[@]}):" >> $summary_file
-if [ ${#passed_tests[@]} -eq 0 ]; then
-    echo "  Nenhum teste aprovado." >> $summary_file
-else
-    for test in "${passed_tests[@]}"; do
-        echo "  - $test" >> $summary_file
-    done
-fi
-echo >> $summary_file
-
-echo "TESTES FALHADOS (${#failed_tests[@]}):" >> $summary_file
-if [ ${#failed_tests[@]} -eq 0 ]; then
-    echo "  Nenhum teste falhou." >> $summary_file
-else
-    for test in "${failed_tests[@]}"; do
-        echo "  - $test" >> $summary_file
-    done
-fi
-
-echo >> $summary_file
-echo "Relatório de resumo gerado em: $summary_file"
