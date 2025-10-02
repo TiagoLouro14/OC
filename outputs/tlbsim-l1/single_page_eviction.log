@@ -393222,12 +393222,12 @@ Evicting TLB L1 entry i=30 VPN=ffde PPN=ffdf valid=1 dirty=0...
 * R ffff000
 ***** Page fault! *****
 ***** Evicting page 0 *****
-[6619036] R DRAM[0]
-[6619136] W DRAM[0]
+[6619037] R DRAM[0]
+[6619137] W DRAM[0]
 PTE found (VA=ffff000 VPN=ffff PA=0)
 Evicting TLB L1 entry i=31 VPN=ffdf PPN=ffe0 valid=1 dirty=0...
-[6619236] R DRAM[0]
-Elapsed: 6619236 ns
+[6619237] R DRAM[0]
+Elapsed: 6619237 ns
 Total instructions executed: 65536
 Total page faults: 65536
 Total page evictions: 1
