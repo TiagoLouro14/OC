@@ -9,6 +9,7 @@ BENCH_DIR := benchmarks
 EXEC := $(BUILD_DIR)/tlbsim
 
 SRCS := $(wildcard $(SRC_DIR)/*.c)
+SRCS := $(filter-out $(SRC_DIR)/tlb_l1.c $(SRC_DIR)/tlb_l2.c, $(SRCS))
 OBJS := $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(SRCS))
 HEADERS := $(wildcard $(SRC_DIR)/*.h)
 
